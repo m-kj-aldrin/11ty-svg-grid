@@ -1,0 +1,38 @@
+:root {
+  --col-hue: 195;
+  --col-hue-offset: -90;
+  --col-wht: var(--col-hue) 20% 97.5%;
+  --col-blk: var(--col-hue) 30% 20%;
+
+  --col-primary: var(--col-hue) 45% 55%;
+  --col-secondary: calc(var(--col-hue) + var(--col-hue-offset)) 90% 45%;
+  --col-ternary: calc(var(--col-hue) + var(--col-hue-offset) * 1.5) 90% 45%;
+}
+body {
+  font-family: "Courier New", Courier, monospace;
+  color: hsl(var(--col-blk));
+  padding: 1rem;
+
+  display: grid;
+}
+main{
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+button {
+  cursor: pointer;
+  background-color: transparent;
+  border-color: currentColor;
+  border-style: solid;
+  border-radius: 1px;
+  line-height: 1;
+  padding-inline: 0.5em;
+  padding-top: 0.25em;
+  padding-bottom: 0.4em;
+}
+button:where(:hover, :focus) {
+  background-color: hsl(var(--col-blk)) !important;
+  color: hsl(var(--col-wht));
+}

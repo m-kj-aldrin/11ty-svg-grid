@@ -1,0 +1,115 @@
+---
+layout: base.njk
+---
+{% edge "njk" %}
+<svg width="100%" height="100%" viewBox="0 0 256 256" preserveAspectRatio="xMidYMid" id="svg-illu-0">
+  <defs>
+    <style>
+      :root {
+        --col-hue: 195;
+        --col-hue-offset: -90;
+        --col-wht: var(--col-hue) 20% 97.5%;
+        --col-blk: var(--col-hue) 30% 20%;
+      
+        --col-primary: var(--col-hue) 45% 55%;
+        --col-secondary: calc(var(--col-hue) + var(--col-hue-offset)) 90% 45%;
+        --col-ternary: calc(var(--col-hue) + var(--col-hue-offset) * 1.5) 90% 45%;
+      }
+    </style>
+    {% set patternWidth = 4 %}
+    <pattern
+      id="pattern-grid"
+      width="{{ patternWidth }}"
+      height="{{ patternWidth }}"
+      patternUnits="userSpaceOnUse"
+      patternTransform="translate(0 0)"
+    >
+      <g stroke="hsl(var(--col-primary))" stroke-width="0.25" opacity="0.75">
+        <line
+          x1="0"
+          x2="{{ patternWidth }}"
+          y1="{{ patternWidth / 2 }}"
+          y2="{{ patternWidth / 2 }}"/>
+        <line
+          y1="0"
+          y2="{{ patternWidth }}"
+          x1="{{ patternWidth / 2 }}"
+          x2="{{ patternWidth / 2 }}"/>
+      </g>
+    </pattern>
+  </defs>
+  <g>
+    {# grid pattern #}
+    <rect width="100%" height="100%" fill="url(#pattern-grid)"/>
+    <g class="bend-group" stroke="hsl(var(--col-primary))" fill="transparent" stroke-width="0.5" >
+      {% set anchor = null %}
+      {% for enity in range(0, 32) %}
+        {# random color from selection #}
+        {% set color = ['hsl(var(--col-secondary))', 'hsl(var(--col-ternary))'] | random %}
+        {# entity group #}
+        {% set entityCoord = {
+          x: ([0.5, 7.5] | rand) * 32,
+          y: ([0.5, 7.5] | rand) * 32
+        } %}
+        <g class="bend-entity" transform="translate({{ entityCoord.x }} {{ entityCoord.y }})" stroke="{{color}}">
+          {% set stringPath = "M0,0" + " " %}
+          {% set coord = {
+            x: 0,
+            y: 0
+          } %}
+          {% set stepLength = ([1, 3] | rand) * 8 %}
+          {% for part in range(0, [1, 4] | rand) %}
+            {% if[0, 2] | rand %}
+            {# keep track of current position #}
+            {# horisontal movement #}
+            {% set coord = {
+              x: coord.x + stepLength,
+              y: coord.y
+            }%}
+            {# vertical movement #}
+          {% else %}
+            {% set coord = {
+            x: coord.x,
+            y: coord.y + stepLength
+            }%}
+          {% endif %}
+          {# line or arc #}
+          {% if[0, 5] | rand %}
+          {% set stringPath = stringPath + 'L' + coord.x + "," + coord.y + " " %}
+        {% else %}
+          {% set stringPath = stringPath + 'A1,1 0 0 0' + coord.x + "," + coord.y + " " %}
+          {# place an extra circle inside the arc #}
+          {% if[0, 2] | rand %}
+          <circle cx="{{coord.x/2}}" cy="{{coord.y/2}}" r="2" fill="{{color}}" stroke="none"/>
+        {% endif %}
+      {% endif %}
+
+    {% endfor %}
+
+    {# if the previous entity left an anchor #}
+    {% if anchor %}
+      {# set the coord to the anchor - the current entityCoord #}
+      {# {% set stringPath = stringPath + "L" + (anchor.x - entityCoord.x) + " " + (anchor.y - entityCoord.y) %} #}
+      {% set d = ((anchor.x - entityCoord.x) ** 2 + (anchor.y - entityCoord.y) ** 2) ** 0.5 %}
+      <line x1="{{coord.x}}" y1="{{coord.y}}" x2="{{anchor.x - entityCoord.x}}" y2="{{anchor.y - entityCoord.y}}" stroke-dasharray="{{d / 32}}" />
+      {% set anchor = null %}
+    {% endif %}
+    {# build path #}
+    <path d="{{stringPath}}" fill="transparent"/>
+    {# start- and endpoint  #}
+    <circle cx="0"  cy="0" r="1" fill="{{color}}" stroke="none"/>
+    <circle cx="{{coord.x}}"  cy="{{coord.y}}" r="1" fill="{{color}}" stroke="none"/>
+  </g>
+
+  {# attach and anchor to the endpoint = last path coord + entityCoord #}
+  {% if not[0, 6] | rand %}
+    {% set anchor = {
+      x: coord.x + entityCoord.x,
+      y: coord.y + entityCoord.y
+    } %}
+  {% endif %}
+{% endfor %}
+</g>
+</g>
+</svg>
+{% endedge %}
